@@ -1,32 +1,50 @@
 name: "TrafficBot Pro"
-description: "Automated city traffic updates for Microsoft Teams using GitHub Actions."
-author: "Ramesh Choudhary"
+description: "Multi-city automated traffic alerts to Microsoft Teams using GitHub Actions."
+author: "Ramesh0708"
 branding:
-  icon: "traffic-light"
-  color: "yellow"
+  icon: traffic-light
+  color: red
 
 inputs:
   city:
-    description: "City name (e.g., Pune, Mumbai, Delhi)"
+    description: "City to fetch traffic updates for (e.g., Pune, Mumbai, Bangalore)"
+    required: false
+    default: "Pune"
+
+  teams_webhook_url:
+    description: "Microsoft Teams Incoming Webhook URL"
     required: true
-  webhook:
-    description: "Microsoft Teams Webhook URL"
-    required: true
+
+  enable_creator_spotlight:
+    description: "Promote your YouTube channel (yes/no)"
+    required: false
+    default: "no"
+
+  youtube_link:
+    description: "Link to your YouTube channel"
+    required: false
+    default: "https://youtube.com/@rawbyshivam"
 
 runs:
   using: "composite"
   steps:
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: "3.11"
+        python-version: "3.10"
 
     - name: Install dependencies
-      shell: bash
       run: |
+        python -m pip install --upgrade pip
         pip install -r $GITHUB_ACTION_PATH/requirements.txt
+      shell: bash
 
     - name: Run TrafficBot Pro
-      shell: bash
       run: |
-        python $GITHUB_ACTION_PATH/trafficbot_pro.py --city "${{ inputs.city }}" --webhook "${{ inputs.webhook }}"
+        CITY="${{ inputs.city }}" \
+        TEAMS_WEBHOOK_URL="${{ inputs.teams_webhook_url }}" \
+        CREATOR_SPOTLIGHT="${{ inputs.enable_creator_spotlight }}" \
+        YOUTUBE_LINK="${{ inputs.youtube_link }}" \
+        python $GITHUB_ACTION_PATH/trafficbot_pro.py
+      shell: bash
